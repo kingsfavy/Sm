@@ -1,0 +1,74 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>User Account</title>
+      <link rel="stylesheet" href="styles.css">
+    </head>
+   <body onload="adjustColorsBasedOnTime()">
+
+
+      <h2 style="font-weight:bolder;font-size:18px;text-align:center;">Welcome, ${req.session.user.username} !</h2>
+<br>
+      <a href="/home" style="bottom: 0;">Home</a>
+
+<br>
+       <form action="/login"method="GET">
+           <button type="submit" id="logout" class="btn">Log Out</button>
+         </form> 
+
+<script>
+
+                function adjustColorsBasedOnTime() {
+          const date = new Date();
+          const hours = date.getHours();
+          const body = document.body;
+
+          if (hours >= 6 && hours < 18) { // Daytime (6am to 5:59pm)
+            body.style.backgroundColor = "white";
+            body.style.color = "black";
+          } else { // Nighttime (6pm to 5:59am)
+            body.style.backgroundColor = "black";
+            body.style.color = "white";
+          }
+        }
+
+        // Call the function when the page loads to adjust colors based on the time of day
+        adjustColorsBasedOnTime();
+
+        // Redirect after 5 seconds
+        setTimeout(() => {
+          window.location.href = '/home';
+        }, 5000);
+
+document.addEventListener('DOMContentLoaded', () => {
+          const logoutButton = document.getElementById('logout');
+          if (logoutButton) {
+            logoutButton.addEventListener('click', (event) => {
+
+docunent.getElementById("hide").style.display = "none";
+
+docunent.getElementById("form").style.display = "block";
+
+              event.preventDefault();
+
+              fetch('/login', {
+                method: 'GET',
+                credentials: 'same-origin'
+              })
+              .then(response => {
+                if (response.ok) {
+                  localStorage.clear(); // Clear client-side data
+ window.location.href = '/account'; // Redirect to login or home page
+                } else {
+                  console.error('Logout failed');
+                }
+              })
+              .catch(error => console.error('Error:', error));
+            });
+          }
+        });
+</script>
+    </body>
+    </html>

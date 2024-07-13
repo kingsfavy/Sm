@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign-Up</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="adjustColorsBasedOnTime()">
+
+<div class="image">
+<br>
+<img src="logo.jpeg" class="product-img assembly">
+</div>
+<div style="bottom:0;">
+  <h1>Sign Up</h1>
+  <form action="/" method="POST">
+    <input type="text" name="username" placeholder="Username" id="username"><br><br>
+    <input type="password" name="password" id="pass" placeholder="Password"><br><br>
+    <button type="submit" class="btn">Sign Up</button>
+  </form>
+<br>
+  <a href="/login">Already have an account? Log in</a>
+</div>
+
+ <script>
+
+        function adjustColorsBasedOnTime() {
+          const date = new Date();
+          const hours = date.getHours();
+          const body = document.body;
+
+          if (hours >= 6 && hours < 18) { // Daytime (6am to 5:59pm)
+            body.style.backgroundColor = "white";
+            body.style.color = "black";
+          } else { // Nighttime (6pm to 5:59am)
+            body.style.backgroundColor = "black";
+            body.style.color = "white";
+          }
+        }
+
+  </script>
+</body>
+</html>

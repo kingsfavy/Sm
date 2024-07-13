@@ -1,0 +1,125 @@
+ <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Home</title>
+      <link rel="stylesheet" href="styles.css">
+    </head>
+      <body onload="adjustColorsBasedOnTime()">
+
+    <a href="/user"><button type="button" class="btn me">Me</button></a>
+
+    <div class="hamburger-menu">
+        <div class="menu-icon" id="menuIcon">
+            &#9776;
+        </div>
+        <div class="menu-content nav" id="menuContent">
+            <ul>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Account</a></li>
+                <li><a href="#">Add product</a></li>
+                <li><a href="#">Cart</a></li>
+                <li><a href="#">Setting</a></li>
+                <li><a href="#">Promotion</a></li>
+
+            </ul>
+        </div>
+    </div>
+    <br>
+    <h1 id="welcome"><span id="wel">Welcome to </span>King's Shopping Mall!</h1>
+    <h3 style="text-align:center">Making you look good is our priority...</h3>
+    <br>
+    <hr style="box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+    <br>
+    <input type="text" id="search" placeholder="search a product" name="text" class="search">
+    <img src="search.png" onclick="search()" class="search-icon">
+    <br><br>
+    <select id="category">
+        <option value="all">All Categories</option>
+        <option value="wears">Wears</option>
+        <option value="jewelries">Jewelries</option>
+        <option value="accessories">Accessories</option>
+        <option value="skincare products">Skin Care</option>
+        <option value="food">Food</option>
+    </select>
+    <br>
+    <p>Our products:</p>
+    <div id="products">
+        <!-- Dynamically generate product links -->
+    </div>
+    <br>
+    <br>
+    <div class="nav">
+   <a href="/posts">POST</a>
+        <a href="/users">CHAT</a>
+        <a href="/posts" onclick="">NEWS FEED</a>
+    </div>
+<br>
+    <div id="content"></div>
+    <br>
+    <p class="foot" id="foot"></p>
+
+<script>
+
+                function adjustColorsBasedOnTime() {
+          const date = new Date();
+          const hours = date.getHours();
+          const body = document.body;
+
+          if (hours >= 6 && hours < 18) { // Daytime (6am to 5:59pm)
+            body.style.backgroundColor = "white";
+            body.style.color = "black";
+          } else { // Nighttime (6pm to 5:59am)
+            body.style.backgroundColor = "black";
+            body.style.color = "white";
+          }
+        }
+
+        // Call the function when the page loads to adjust colors based on the time of day
+        adjustColorsBasedOnTime();
+
+ const year = new Date().getFullYear();
+  document.getElementById("foot").innerHTML = "King Shopping Mall from 2000 - " + year + " All Rights Reserved.";
+
+
+
+        function hideWelcomeMessage() {
+            var welcomeElement = document.getElementById('wel');
+            if (welcomeElement) {
+                welcomeElement.style.display = 'none';
+            }
+        }
+
+
+        setTimeout(hideWelcomeMessage, 8000);
+
+document.getElementById('menuIcon').addEventListener('click', function(event) {
+    var menuContent = document.getElementById('menuContent');
+    if (menuContent.style.display === 'none') {
+        menuContent.style.display = 'block';
+        setTimeout(function() {
+            menuContent.style.left = '0';
+        }, 10); // Small delay to allow the display change to take effect
+    } else {
+        menuContent.style.left = '-250px';
+        setTimeout(function() {
+            menuContent.style.display = 'none';
+        }, 300); // Match the CSS transition duration
+    }
+    event.stopPropagation();
+});
+
+document.addEventListener('click', function(event) {
+    var menuContent = document.getElementById('menuContent');
+    if (menuContent.style.display === 'block' && !menuContent.contains(event.target) && !event.target.matches('#menuIcon')) {
+        menuContent.style.left = '-250px';
+        setTimeout(function() {
+            menuContent.style.display = 'none';
+        }, 300); // Match the CSS transition duration
+    }
+});
+
+</script>
+    </body>
+    </html>

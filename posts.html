@@ -1,0 +1,203 @@
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Social Posts</title>
+            <link rel="stylesheet" href="/styles.css">
+            <style>
+                .modal {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                .modal-content {
+                    background-color: none;
+                    padding: 20px;
+                    border-radius: 5px;
+                  
+                }
+
+                .blur {
+                    filter: blur(5px);
+                }
+            </style>
+        </head>
+        <body>
+            <div id="app">
+                <h1 style="left:10px; float:left;">Post</h1>
+                <br>
+                <form id="postForm">
+                    <input type="hidden" id="username" value="${user.username}">
+                    <textarea id="content" rows="5" cols="50" style="background-color:lightgrey;" placeholder="What's on your mind?" required></textarea>
+                    <br>
+                    <button type="submit" class="btn">Post</button>
+                </form>
+                <br>
+                <hr class="hr">
+                <br>
+                <div id="posts"></div>
+            </div>
+
+         <div id="comments"></div>
+
+
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <h5 onclick="closeModal()" style=" float:right;">Back</h5>
+
+                    <h2 style="float:left;">Comments</h2>
+<form id="modal-form">
+                    <textarea style="background-color:lightgrey;" id="commentInput" rows="5" cols="50" placeholder="Add a comment"></textarea>
+                    <br>
+                    <button type="submit" id="addCommentBtn" class="btn" onclick="submitComment()">Add Comment</button>
+</form>
+                </div>
+            </div>
+
+            <script>
+                let currentPostId = null;
+
+                function formatDateTime(date) {
+                    const padToTwoDigits = num => num.toString().padStart(2, '0');
+                    const year = date.getFullYear();
+                    const month = padToTwoDigits(date.getMonth() + 1);
+                    const day = padToTwoDigits(date.getDate());
+                    const hours = padToTwoDigits(date.getHours());
+                    const minutes = padToTwoDigits(date.getMinutes());
+                    return \`\${day}/\${month}/\${year} \${hours}:\${minutes}\`;
+                }
+
+                async function loadPosts() {
+                    const response = await fetch('/posts');  // Fetch posts from server
+                    const posts = await response.json();
+                    const postsDiv = document.getElementById('posts');
+                    postsDiv.innerHTML = '';
+                    posts.forEach(post => {
+                        const postDiv = document.createElement('div');
+                        postDiv.className = 'post';
+                        postDiv.id = \`post-\${post.id}\`;
+                        postDiv.innerHTML = \`
+                            <div><strong>\${post.username}</strong></div>
+                            <div class="content">\${post.content}</div>
+                            <div class="date-time">\${post.dateTime}</div>
+                            <div class="reactions">
+                                <button onclick="reactToPost(\${post.id}, 'like', this)">👍 \${post.likes}</button>
+                                <button onclick="reactToPost(\${post.id}, 'dislike', this)">👎 \${post.dislikes}</button>
+
+                                <button onclick="openModal(\${post.id})">💬 \${post.comments.length}</button>
+                            </div>
+                        \`;
+                        postsDiv.appendChild(postDiv);
+                    });
+                }
+
+                document.getElementById('postForm').addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const username = document.getElementById('username').value;
+                    const content = document.getElementById('content').value;
+                    const dateTime = formatDateTime(new Date());
+                    const response = await fetch('/posts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, content, dateTime, id: Date.now() })
+                    });
+
+                    if (response.ok) {
+                        document.getElementById('content').value = '';
+                        loadPosts();  // Reload posts after a new post is added
+                    }
+                });
+
+                const eventSource = new EventSource('/post');
+                eventSource.onmessage = function(event) {
+                    const post = JSON.parse(event.data);
+                    const postDiv = document.getElementById(\`post-\${post.id}\`);
+                    if (postDiv) {
+                        postDiv.querySelector('.reactions button').innerHTML = \`👍 \${post.likes}\`;
+                        postDiv.querySelector('.reactions button:nth-child(2)').innerHTML = \`👎 \${post.dislikes}\`;
+                        postDiv.querySelector('.reactions button:nth-child(3)').innerHTML = \`💬 \${post.comments.length}\`;
+                    } else {
+                        const postsDiv = document.getElementById('posts');
+                        const newPostDiv = document.createElement('div');
+                        newPostDiv.className = 'post';
+                        newPostDiv.id = \`post-\${post.id}\`;
+                        newPostDiv.innerHTML = \`
+                            <div><strong>\${post.username}</strong></div>
+                            <div class="content">\${post.content}</div>
+                            <div class="date-time">\${post.dateTime}</div>
+                            <div class="reactions">
+                                <button onclick="reactToPost(\${post.id}, 'like', this)">👍 \${post.likes}</button>
+                                <button onclick="reactToPost(\${post.id}, 'dislike', this)">👎 \${post.dislikes}</button>
+                                <button onclick="openModal(\${user.id})">💬 \${post.comments.length}</button>
+                            </div>
+                        \`;
+                        postsDiv.appendChild(newPostDiv);
+                    }
+                };
+
+              async function reactToPost(postId, reaction, button) {
+                    const endpoint = reaction === 'like' ? \`/posts/\${postId}/like\` : \`/posts/\${postId}/dislike\`;
+                    const response = await fetch(endpoint, { method: 'POST' });
+                    if (response.ok) {
+                        const post = await response.json();
+                                            button.innerHTML = reaction === 'like' ? \`👍 \${post.likes}\` : \`👎 \${post.dislikes}\`;
+                    button.disabled = true;
+                    button.nextElementSibling.disabled = true;
+                }
+            }
+       
+
+        function submitComment() {
+            var comment = document.getElementById("commentInput").value;
+            var commentInput = document.createElement("input");
+            commentInput.setAttribute("type", "hidden");
+            commentInput.setAttribute("name", "comment");
+            commentInput.setAttribute("value", comment);
+            currentForm.appendChild(commentInput);
+            currentForm.submit();
+        }
+
+
+function openModal(postId) {
+
+document.getElementById('modal').style.display = 'block';
+  document.getElementById('app').classList.add('blur');
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+  document.getElementById('app').classList.remove('blur');
+}
+
+       loadPosts(); 
+
+            // Auto-update the posts div every 5 seconds
+            setInterval(loadPosts, 1000);
+
+            function adjustColorsBasedOnTime() {
+                const date = new Date();
+                const hours = date.getHours();
+                const body = document.body;
+
+                if (hours >= 6 && hours < 18) { // Daytime (6am to 5:59pm)
+                    body.style.backgroundColor = "white";
+                    body.style.color = "black";
+                } else { // Nighttime (6pm to 5:59am)
+                    body.style.backgroundColor = "black";
+                    body.style.color = "white";
+                }
+            }
+
+            adjustColorsBasedOnTime();
+        </script>
+    </body>
+    </html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h5>Invalid username or password. Click the sign-up button if you haven't created an account yet.</h5>
+  
+  <br><br>
+  <a href="/"><button class="btn">Sign Up</button></a>
+  <br><br>
+<form action="/recover-password" method="get">
+  <button type ="submit" class="btn">>FORGOT PASSWORD</button>
+</form>
+  <script>
+    function adjustColorsBasedOnTime() {
+      const date = new Date();
+      const hours = date.getHours();
+      const body = document.body;
+
+      if (hours >= 6 && hours < 18) { // Daytime (6am to 5:59pm)
+        body.style.backgroundColor = "white";
+        body.style.color = "black";
+      } else { // Nighttime (6pm to 5:59am)
+        body.style.backgroundColor = "black";
+        body.style.color = "white";
+      }
+    }
+
+    // Call the function when the page loads to adjust colors based on the time of day
+    adjustColorsBasedOnTime();
+  </script>
+</body>
+</html>
